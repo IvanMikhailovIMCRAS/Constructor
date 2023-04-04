@@ -22,6 +22,7 @@ class Chain(MolGraph):
             bonds.append((i, i+1))
         super().__init__(bonds)
 
+
 class Aggrecan(MolGraph):
     """
     Aggrecan molecular structure inherited from MolGraph
@@ -41,23 +42,24 @@ class Aggrecan(MolGraph):
         if m1 < 1 or m2 < 1:
             raise ValueError(f'(m1 = {m1}) and (m2 = {m2}) sets are invalid ')
         if N1 % m1 != 0 or N2 % m2 != 0:
-            raise ValueError('N1 and / or N2 must be evenly divisible by m1 and / or m2')
+            raise ValueError(
+                'N1 and / or N2 must be evenly divisible by m1 and / or m2')
         if N1 <= 1 or N2 <= 0:
             raise ValueError('values must be N1 >= 1 or N2 >= 0')
-        if n1 <= 0 or n2 <= 0 :
+        if n1 <= 0 or n2 <= 0:
             raise ValueError('values must be n1 >= 0 or n2 >= 0 ')
-        
+
         self.N1 = N1
         self.N2 = N2
         self.n1 = n1
         self.n2 = n2
         self.m1 = m1
         self.m2 = m2
-        self.M = N1 + N2 + N1 * n1 // m1 + N2 *n2 // m2 #Polymerization degree
-        
+        self.M = N1 + N2 + N1 * n1 // m1 + N2 * n2 // m2  # Polymerization degree
+
         bonds: Bondtype = []
         self.btypes = []
-        
+
         self.btypes.append(1)
         for i in range(self.N1-1):
             bonds.append((i, i+1))
@@ -68,28 +70,29 @@ class Aggrecan(MolGraph):
             bonds.append((i+current_N, i+current_N+1))
             self.btypes.append(2)
         current_N += self.N2
-        
+
         for i in range(N1 // m1):
             current_N += 1
             self.btypes.append(4)
-            nc = m1 // 2 + i * m1 
+            nc = m1 // 2 + i * m1
             bonds.append((nc, current_N))
             for j in range(1, n1):
                 current_N += 1
                 self.btypes.append(4)
                 bonds.append((current_N-1, current_N))
-        
+
         for i in range(N2 // m2):
             current_N += 1
             self.btypes.append(5)
-            nc = N1 + m2 // 2 + i * m2 
+            nc = N1 + m2 // 2 + i * m2
             bonds.append((nc, current_N))
             for j in range(1, n2):
                 current_N += 1
                 self.btypes.append(5)
-                bonds.append((current_N-1, current_N))  
-        self.bonds = bonds 
-        # super().__init__(bonds, sort=False)
+                bonds.append((current_N-1, current_N))
+
+        super().__init__(bonds, sort=False)
+
 
 class Dendron(MolGraph):
     """
@@ -159,17 +162,17 @@ class Brush(MolGraph):
         self.l_end_ch = l_end_ch
         self.types = list()
         bonds: Bondtype = []
-        self.types = [1] * self.l_end_ch + [2] * self.pd * self.m +[1] * self.l_end_ch
-        
+        self.types = [1] * self.l_end_ch + [2] * \
+            self.pd * self.m + [1] * self.l_end_ch
+
         for i in range(self.n_end_ch * self.l_end_ch + self.pd * self.m - 1):
             bonds.append((i, i+1))
-            if (i < self.l_end_ch) or (i >= self.l_end_ch + self.pd * self.m ):
+            if (i < self.l_end_ch) or (i >= self.l_end_ch + self.pd * self.m):
                 self.types[i] = 1
                 if i == self.n_end_ch * self.l_end_ch + self.pd * self.m - 2:
                     self.types[i + 1] = 1
             else:
                 self.types[i] = 2
-            
 
         n_curent = self.pd * self.m - 1 + self.n_end_ch * self.l_end_ch
         for i in range(1, self.pd + 1):
@@ -190,13 +193,14 @@ class Brush(MolGraph):
         #     for bond in element:
         #         if bond not in self.types:
         #             self.types[bond] = 2
-        self.types = self.types + [3] * (self.num_beads - self.n_end_ch * self.l_end_ch - self.pd*self.m) 
-                                                        
+        self.types = self.types + \
+            [3] * (self.num_beads - self.n_end_ch *
+                   self.l_end_ch - self.pd*self.m)
+
 
 if __name__ == '__main__':
-    x = Aggrecan(N1 = 10 , N2 = 10, n1 = 2, n2 = 3, m1 = 5, m2 = 1)
+    x = Aggrecan(N1=10, N2=10, n1=2, n2=3, m1=5, m2=1)
     print(x.bonds)
     print(x.M)
     print(x.btypes)
     print(len(x.btypes))
-    
