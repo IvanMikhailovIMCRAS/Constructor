@@ -22,6 +22,61 @@ class Chain(MolGraph):
             bonds.append((i, i+1))
         super().__init__(bonds)
 
+class Aggrecan(MolGraph):
+    """
+    Aggrecan molecular structure inherited from MolGraph
+
+    Args:
+        MolGraph (_type_): see constructor.MolGraph
+    Initial attribute:
+        self.N1 (int): backbone lenth (root block)
+        self.N2 (int): backbone lenth (head block)
+        self.n1 (int): side chain length (root block)
+        self.n2 (int): side chain length (head block)
+        self.m1 (int): spacer length (root block)
+        self.m2 (int): spacer length (head block)
+    """
+
+    def __init__(self, N1: int, N2: int, n1: int, n2: int, m1: int, m2: int) -> None:
+        if m1 < 1 or m2 < 1:
+            raise ValueError(f'(m1 = {m1}) and (m2 = {m2}) sets are invalid ')
+        if N1 % m1 != 0 or N2 % m2 != 0:
+            raise ValueError('N1 and / or N2 must be evenly divisible by m1 and / or m2')
+        if N1 <= 1 or N2 <= 0:
+            raise ValueError('values must be N1 >= 1 or N2 >= 0')
+        if n1 <= 0 or n2 <= 0 :
+            raise ValueError('values must be n1 >= 0 or n2 >= 0 ')
+        
+        self.N1 = N1
+        self.N2 = N2
+        self.n1 = n1
+        self.n2 = n2
+        self.m1 = m1
+        self.m2 = m2
+        self.M = N1 * (1 + n1 // m1) + N2 * (1 + n2 // m2) #Polymerization degree
+        
+        bonds: Bondtype = []
+        for i in range(self.N1):
+            bonds.append((i, i+1))
+        current_N = self.N1
+        for i in range(self.N2):
+            bonds.append((i+current_N, i+current_N+1))
+        current_N += self.N2
+        for i in range(N1 // m1):
+            current_N += 1
+            nc = m1 // 2 + i * m1 
+            bonds.append((nc, current_N))
+            for j in range(1, n1):
+                current_N += 1
+                bonds.append((current_N-1, current_N))
+        for i in range(N2 // m2):
+            current_N += 1
+            nc = N1 + m2 // 2 + i * m2 
+            bonds.append((nc, current_N))
+            for j in range(1, n2):
+                current_N += 1
+                bonds.append((current_N-1, current_N))   
+        super().__init__(bonds, sort=False)
 
 class Dendron(MolGraph):
     """
@@ -126,10 +181,6 @@ class Brush(MolGraph):
                                                         
 
 if __name__ == '__main__':
-    # chain = Chain(n=5)
-    # print(chain.bonds)
-    # dendron = Dendron(n=1, g = 2, q = 2)
-    # print(dendron.bonds)
-    brush = Brush(pd=1, m=3, n=2, q=1, n_end_ch=2, l_end_ch=2)
-    print(brush.bonds)
-    print(brush.types)
+    x = Aggrecan(N1 = 10 , N2 = 10, n1 = 2, n2 = 3, m1 = 5, m2 = 1)
+    print(x.bonds)
+    print(x.M)
