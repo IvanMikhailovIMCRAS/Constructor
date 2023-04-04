@@ -53,30 +53,43 @@ class Aggrecan(MolGraph):
         self.n2 = n2
         self.m1 = m1
         self.m2 = m2
-        self.M = N1 * (1 + n1 // m1) + N2 * (1 + n2 // m2) #Polymerization degree
+        self.M = N1 + N2 + N1 * n1 // m1 + N2 *n2 // m2 #Polymerization degree
         
         bonds: Bondtype = []
-        for i in range(self.N1):
+        self.btypes = []
+        
+        self.btypes.append(1)
+        for i in range(self.N1-1):
             bonds.append((i, i+1))
-        current_N = self.N1
+            self.btypes.append(1)
+        current_N = self.N1-1
+
         for i in range(self.N2):
             bonds.append((i+current_N, i+current_N+1))
+            self.btypes.append(2)
         current_N += self.N2
+        
         for i in range(N1 // m1):
             current_N += 1
+            self.btypes.append(4)
             nc = m1 // 2 + i * m1 
             bonds.append((nc, current_N))
             for j in range(1, n1):
                 current_N += 1
+                self.btypes.append(4)
                 bonds.append((current_N-1, current_N))
+        
         for i in range(N2 // m2):
             current_N += 1
+            self.btypes.append(5)
             nc = N1 + m2 // 2 + i * m2 
             bonds.append((nc, current_N))
             for j in range(1, n2):
                 current_N += 1
-                bonds.append((current_N-1, current_N))   
-        super().__init__(bonds, sort=False)
+                self.btypes.append(5)
+                bonds.append((current_N-1, current_N))  
+        self.bonds = bonds 
+        # super().__init__(bonds, sort=False)
 
 class Dendron(MolGraph):
     """
@@ -184,3 +197,6 @@ if __name__ == '__main__':
     x = Aggrecan(N1 = 10 , N2 = 10, n1 = 2, n2 = 3, m1 = 5, m2 = 1)
     print(x.bonds)
     print(x.M)
+    print(x.btypes)
+    print(len(x.btypes))
+    
