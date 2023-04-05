@@ -3,15 +3,15 @@ from bondset import Bondtype
 from dpd_files import print_bonds, print_coord, print_fixed
 from mol import Aggrecan
 from periodic_box import Box
-from scipy import interpolate
+
 
 if __name__ == '__main__':
-    N1 = 60
-    N2 = 60
-    n1 = 10
-    n2 = 30
-    m1 = 3
-    m2 = 3
+    N1 = 30
+    N2 = 30
+    n1 = 0
+    n2 = 20
+    m1 = 1
+    m2 = 1
     num_chain = 64
     length_bond = (1/3)**(1/3)
 

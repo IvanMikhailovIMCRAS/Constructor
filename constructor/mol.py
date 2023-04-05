@@ -44,9 +44,9 @@ class Aggrecan(MolGraph):
         if N1 % m1 != 0 or N2 % m2 != 0:
             raise ValueError(
                 'N1 and / or N2 must be evenly divisible by m1 and / or m2')
-        if N1 <= 1 or N2 <= 0:
+        if N1 <= 1 or N2 < 0:
             raise ValueError('values must be N1 >= 1 or N2 >= 0')
-        if n1 <= 0 or n2 <= 0:
+        if n1 < 0 or n2 < 0:
             raise ValueError('values must be n1 >= 0 or n2 >= 0 ')
 
         self.N1 = N1
@@ -70,26 +70,26 @@ class Aggrecan(MolGraph):
             bonds.append((i+current_N, i+current_N+1))
             self.btypes.append(2)
         current_N += self.N2
-
-        for i in range(N1 // m1):
-            current_N += 1
-            self.btypes.append(4)
-            nc = m1 // 2 + i * m1
-            bonds.append((nc, current_N))
-            for j in range(1, n1):
+        if n1 > 0:
+            for i in range(N1 // m1):
                 current_N += 1
                 self.btypes.append(4)
-                bonds.append((current_N-1, current_N))
-
-        for i in range(N2 // m2):
-            current_N += 1
-            self.btypes.append(5)
-            nc = N1 + m2 // 2 + i * m2
-            bonds.append((nc, current_N))
-            for j in range(1, n2):
+                nc = m1 // 2 + i * m1
+                bonds.append((nc, current_N))
+                for j in range(1, n1):
+                    current_N += 1
+                    self.btypes.append(4)
+                    bonds.append((current_N-1, current_N))
+        if n2 > 0:
+            for i in range(N2 // m2):
                 current_N += 1
                 self.btypes.append(5)
-                bonds.append((current_N-1, current_N))
+                nc = N1 + m2 // 2 + i * m2
+                bonds.append((nc, current_N))
+                for j in range(1, n2):
+                    current_N += 1
+                    self.btypes.append(5)
+                    bonds.append((current_N-1, current_N))
 
         super().__init__(bonds, sort=False)
 
