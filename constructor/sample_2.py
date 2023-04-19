@@ -4,17 +4,17 @@ from dpd_files import print_bonds, print_coord, print_ent_file
 from mol import Brush
 from periodic_box import Box
 import os
-def main(m, n):
-    num_ch = 400 #number of chains
+def main(m, pd, n, q, n_end_ch, l_end_ch):
+    num_ch = 1000 #number of chains
     
 
-    # m = 3 # spacer length
-    pd = 75/m #polymerization degree
-    # n = 4 # side chain length
-    q = 1 #number of side chains grafting into one point
-    n_end_ch = 2 #number of ending chains
-    l_end_ch = 4 # length of ending chains 
-    box_size = (num_ch*(pd * m + m * n * q + n_end_ch * l_end_ch) / 3) ** (1 / 3)
+    # # m = 3 # spacer length
+    # pd = 75/m #polymerization degree
+    # # n = 4 # side chain length
+    # q = 1 #number of side chains grafting into one point
+    # n_end_ch = 2 #number of ending chains
+    # l_end_ch = 4 # length of ending chains 
+    box_size = (num_ch*(pd * m + pd * n * q + n_end_ch * l_end_ch) / 3) ** (1 / 3)
     
     box = Box(x=box_size, y=box_size, z=box_size)
     x = np.array([])
@@ -43,19 +43,25 @@ def main(m, n):
     print_ent_file(x=x, y=y, z=z, b_type=b_type)
 
 if __name__ == '__main__':
+    total_length = 50
     if not os.path.isdir('OUTPUT'):
         os.mkdir('OUTPUT')
     os.chdir('OUTPUT')
-    for n in [4, 8, 12, 16, 20]:
-        if not os.path.isdir(f'n={n}'):
-            os.mkdir(f'n={n}')
-        os.chdir(f'n={n}')
+    for l_end_ch in range(1,18):
+        if not os.path.isdir(f"lenf{l_end_ch}_pd{total_length-l_end_ch}"):
+            os.mkdir(f"lenf{l_end_ch}_pd{total_length-l_end_ch}")
+        os.chdir(f"lenf{l_end_ch}_pd{total_length-l_end_ch}")
+        main(m=1, pd=total_length-l_end_ch, n=0, q=1, n_end_ch=1, l_end_ch=l_end_ch) 
+        os.chdir('../')   # for n in [4, 8, 12, 16, 20]:
+    #     if not os.path.isdir(f'n={n}'):
+    #         os.mkdir(f'n={n}')
+    #     os.chdir(f'n={n}')
            
-        for m in [1, 3, 5, 15]:
-            if not os.path.isdir(f'n={n}'):
-                os.mkdir(f'n={n}')
-            os.chdir(f'n={n}')
-            main(m, n)
-            os.chdir('../')
-        os.chdir('../')     
+    #     for m in [1, 3, 5, 15]:
+    #         if not os.path.isdir(f'n={n}'):
+    #             os.mkdir(f'n={n}')
+    #         os.chdir(f'n={n}')
+    #         main(m, n)
+    #         os.chdir('../')
+    #     os.chdir('../')     
             
