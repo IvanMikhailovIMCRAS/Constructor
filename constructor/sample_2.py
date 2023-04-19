@@ -3,6 +3,7 @@ from bondset import Bondtype
 from dpd_files import print_bonds, print_coord, print_ent_file
 from mol import Brush
 from periodic_box import Box
+import shutil
 import os
 def main(m, pd, n, q, n_end_ch, l_end_ch):
     num_ch = 1000 #number of chains
@@ -51,7 +52,14 @@ if __name__ == '__main__':
         if not os.path.isdir(f"lenf{l_end_ch}_pd{total_length-l_end_ch}"):
             os.mkdir(f"lenf{l_end_ch}_pd{total_length-l_end_ch}")
         os.chdir(f"lenf{l_end_ch}_pd{total_length-l_end_ch}")
-        main(m=1, pd=total_length-l_end_ch, n=0, q=1, n_end_ch=1, l_end_ch=l_end_ch) 
+        if not os.path.exists("dpd.exe"):
+            shutil.copy('../../dpd.exe','dpd.exe')
+        if not os.path.exists("FIELD"):
+            shutil.copy('../../FIELD','FIELD')
+        if not os.path.exists("CONTR"):
+            shutil.copy('../../CONTR','CONTR')
+        if not os.path.exists("COORD"):    
+            main(m=1, pd=total_length-l_end_ch, n=0, q=1, n_end_ch=1, l_end_ch=l_end_ch) 
         os.chdir('../')   # for n in [4, 8, 12, 16, 20]:
     #     if not os.path.isdir(f'n={n}'):
     #         os.mkdir(f'n={n}')
